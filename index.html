@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>실시간 주차장 안내 및 관리</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; background: #f4f6f8; margin: 0; padding: 20px; }
+        .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .count { font-size: 32px; font-weight: bold; color: #2c3e50; }
+        .btn { padding: 12px 24px; font-size: 18px; border: none; border-radius: 8px; cursor: pointer; margin: 5px; color: white; }
+        .btn-in { background-color: #2ec4b6; }
+        .btn-out { background-color: #e71d36; }
+        .recommend { background-color: #eef2ff; border: 2px solid #6366f1; padding: 15px; border-radius: 8px; font-size: 20px; font-weight: bold; color: #4338ca; }
+    </style>
+</head>
+<body>
+
+    <h2>🚗 주차장 현황 모니터링</h2>
+
+    <!-- 추천 안내 구역 -->
+    <div class="card">
+        <div>현재 이동 안내 구역</div>
+        <div id="recommendZone" class="recommend">계산 중...</div>
+    </div>
+
+    <!-- 구역별 현황 및 관리 -->
+    <div class="card">
+        <h3>A구역 (최대 10대)</h3>
+        <div class="count"><span id="zoneA_count">0</span> / 10</div>
+        <button class="btn btn-in" onclick="changeCount('A', 1)">입차 (+1)</button>
+        <button class="btn btn-out" onclick="changeCount('A', -1)">출차 (-1)</button>
+    </div>
+
+    <div class="card">
+        <h3>B구역 (최대 10대)</h3>
+        <div class="count"><span id="zoneB_count">0</span> / 10</div>
+        <button class="btn btn-in" onclick="changeCount('B', 1)">입차 (+1)</button>
+        <button class="btn btn-out" onclick="changeCount('B', -1)">출차 (-1)</button>
+    </div>
+
+    <script>
+        // 초기 구역 설정 (최대 주차 가능 대수 및 현재 수량)
+        const zones = {
+            A: { max: 10, current: 0 },
+            B: { max: 10, current: 0 }
+        };
+
+        function updateUI() {
+            // 수량 표시 업데이트
+            document.getElementById('zoneA_count').innerText = zones.A.current;
+            document.getElementById('zoneB_count').innerText = zones.B.current;
+
+            // 잔여석 비율 계산 및 여유 구역 추천
+            let remA = zones.A.max - zones.A.current;
+            let remB = zones.B.max - zones.B.current;
+
+            let recommendText = "";
+            if (remA <= 0 && remB <= 0) {
+                recommendText = "⛔ 전체 만차입니다";
+            } else if (remA >= remB) {
+                recommendText = `👉 A구역으로 이동하세요 (여유: ${remA}석)`;
+            } else {
+                recommendText = `👉 B구역으로 이동하세요 (여유: ${remB}석)`;
+            }
+            document.getElementById('recommendZone').innerText = recommendText;
+        }
+
+        function changeCount(zone, val) {
+            let target = zones[zone];
+            if (val > 0 && target.current >= target.max) {
+                alert(`${zone}구역은 이미 만차입니다!`);
+                return;
+            }
+            if (val < 0 && target.current <= 0) {
+                return;
+            }
+            target.current += val;
+            updateUI();
+        }
+
+        // 최초 UI 실행
+        updateUI();
+    </script>
+</body>
+</html>
