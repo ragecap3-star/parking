@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>실시간 공유 주차장 관리</title>
-    <!-- Firebase SDK (무료 실시간 DB 연동) -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <style>
@@ -26,22 +26,32 @@
         <div id="recommendZone" class="recommend">데이터 불러오는 중...</div>
     </div>
 
+    <!-- 1. 하이코 지상 주차장 -->
     <div class="card">
-        <h3>A구역 (최대 10대)</h3>
-        <div class="count"><span id="zoneA_count">0</span> / 10</div>
-        <button class="btn btn-in" onclick="changeCount('A', 1)">입차 (+1)</button>
-        <button class="btn btn-out" onclick="changeCount('A', -1)">출차 (-1)</button>
+        <h3>하이코 지상 주차장 (최대 402대)</h3>
+        <div class="count"><span id="ground_count">0</span> / 402</div>
+        <button class="btn btn-in" onclick="changeCount('ground', 1)">입차 (+1)</button>
+        <button class="btn btn-out" onclick="changeCount('ground', -1)">출차 (-1)</button>
     </div>
 
+    <!-- 2. 하이코 지하 주차장 -->
     <div class="card">
-        <h3>B구역 (최대 10대)</h3>
-        <div class="count"><span id="zoneB_count">0</span> / 10</div>
-        <button class="btn btn-in" onclick="changeCount('B', 1)">입차 (+1)</button>
-        <button class="btn btn-out" onclick="changeCount('B', -1)">출차 (-1)</button>
+        <h3>하이코 지하 주차장 (최대 118대)</h3>
+        <div class="count"><span id="underground_count">0</span> / 118</div>
+        <button class="btn btn-in" onclick="changeCount('underground', 1)">입차 (+1)</button>
+        <button class="btn btn-out" onclick="changeCount('underground', -1)">출차 (-1)</button>
+    </div>
+
+    <!-- 3. 보문 단지 주차장 -->
+    <div class="card">
+        <h3>보문 단지 주차장 (최대 200대)</h3>
+        <div class="count"><span id="bomun_count">0</span> / 200</div>
+        <button class="btn btn-in" onclick="changeCount('bomun', 1)">입차 (+1)</button>
+        <button class="btn btn-out" onclick="changeCount('bomun', -1)">출차 (-1)</button>
     </div>
 
     <script>
-        // 1. 본인의 Firebase 설정 정보로 교체하세요!
+        // Firebase 설정 정보
         const firebaseConfig = {
           apiKey: "AIzaSyDXLRc2RKlumTBbMKYSrVpUossDBjFscCg",
           authDomain: "parking-info-7eb89.firebaseapp.com",
@@ -57,54 +67,68 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // 기본 구역 설정
+        // 3개 주차장 설정 (이름 및 최대 대수)
         const zones = {
-            A: { max: 10, current: 0 },
-            B: { max: 10, current: 0 }
+            ground: { name: '하이코 지상', max: 402, current: 0 },
+            underground: { name: '하이코 지하', max: 118, current: 0 },
+            bomun: { name: '보문 단지', max: 200, current: 0 }
         };
 
-        // 화면(UI) 업데이트
+        // UI 및 추천 구역 업데이트
         function updateUI() {
-            document.getElementById('zoneA_count').innerText = zones.A.current;
-            document.getElementById('zoneB_count').innerText = zones.B.current;
+            document.getElementById('ground_count').innerText = zones.ground.current;
+            document.getElementById('underground_count').innerText = zones.underground.current;
+            document.getElementById('bomun_count').innerText = zones.bomun.current;
 
-            let remA = zones.A.max - zones.A.current;
-            let remB = zones.B.max - zones.B.current;
+            // 잔여 주차 대수 계산
+            let remGround = zones.ground.max - zones.ground.current;
+            let remUnderground = zones.underground.max - zones.underground.current;
+            let remBomun = zones.bomun.max - zones.bomun.current;
 
             let recommendText = "";
-            if (remA <= 0 && remB <= 0) {
-                recommendText = "⛔ 전체 만차입니다";
-            } else if (remA >= remB) {
-                recommendText = `👉 A구역으로 이동하세요 (여유: ${remA}석)`;
+
+            if (remGround <= 0 && remUnderground <= 0 && remBomun <= 0) {
+                recommendText = "⛔ 전체 주차장이 만차입니다";
             } else {
-                recommendText = `👉 B구역으로 이동하세요 (여유: ${remB}석)`;
+                // 가장 잔여 자리가 많은 곳을 추천
+                let maxRem = Math.max(remGround, remUnderground, remBomun);
+                if (maxRem === remGround) {
+                    recommendText = `👉 하이코 지상 주차장으로 이동하세요 (여유: ${remGround}석)`;
+                } else if (maxRem === remUnderground) {
+                    recommendText = `👉 하이코 지하 주차장으로 이동하세요 (여유: ${remUnderground}석)`;
+                } else {
+                    recommendText = `👉 보문 단지 주차장으로 이동하세요 (여유: ${remBomun}석)`;
+                }
             }
+
             document.getElementById('recommendZone').innerText = recommendText;
         }
 
-        // 2. 실시간 데이터 수신 (다른 사람이 변경하면 자동 실행됨)
+        // 실시간 데이터 수신
         db.ref('zones').on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
-                if (data.A) zones.A.current = data.A.current;
-                if (data.B) zones.B.current = data.B.current;
+                if (data.ground) zones.ground.current = data.ground.current;
+                if (data.underground) zones.underground.current = data.underground.current;
+                if (data.bomun) zones.bomun.current = data.bomun.current;
                 updateUI();
             } else {
-                // 초기 데이터가 없는 경우 DB 생성
+                // DB에 초기값이 없는 경우 세팅
                 db.ref('zones').set({
-                    A: { current: 0, max: 10 },
-                    B: { current: 0, max: 10 }
+                    ground: { current: 0, max: 402 },
+                    underground: { current: 0, max: 118 },
+                    bomun: { current: 0, max: 200 }
                 });
             }
         });
 
-        // 3. 수량 변경 시 DB에 전송 (모든 접속자에게 즉시 반영)
+        // 수량 변경 함수
         function changeCount(zone, val) {
             let target = zones[zone];
             let newCount = target.current + val;
 
             if (val > 0 && target.current >= target.max) {
-                alert(`${zone}구역은 이미 만차입니다!`);
+                alert(`${target.name} 주차장은 이미 만차입니다!`);
                 return;
             }
             if (newCount < 0) return;
@@ -117,4 +141,5 @@
         }
     </script>
 </body>
+</html>
 </html>
