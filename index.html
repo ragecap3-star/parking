@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>실시간 주차장 안내 및 관리</title>
+    <title>실시간 공유 주차장 관리</title>
+    <!-- Firebase SDK (무료 실시간 DB 연동) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <style>
         body { font-family: sans-serif; text-align: center; background: #f4f6f8; margin: 0; padding: 20px; }
         .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
@@ -16,15 +19,13 @@
 </head>
 <body>
 
-    <h2>🚗 주차장 현황 모니터링</h2>
+    <h2>🚗 실시간 공유 주차장 현황</h2>
 
-    <!-- 추천 안내 구역 -->
     <div class="card">
         <div>현재 이동 안내 구역</div>
-        <div id="recommendZone" class="recommend">계산 중...</div>
+        <div id="recommendZone" class="recommend">데이터 불러오는 중...</div>
     </div>
 
-    <!-- 구역별 현황 및 관리 -->
     <div class="card">
         <h3>A구역 (최대 10대)</h3>
         <div class="count"><span id="zoneA_count">0</span> / 10</div>
@@ -40,18 +41,33 @@
     </div>
 
     <script>
-        // 초기 구역 설정 (최대 주차 가능 대수 및 현재 수량)
+        // 1. 본인의 Firebase 설정 정보로 교체하세요!
+        const firebaseConfig = {
+          apiKey: "AIzaSyDXLRc2RKlumTBbMKYSrVpUossDBjFscCg",
+          authDomain: "parking-info-7eb89.firebaseapp.com",
+          databaseURL: "https://parking-info-7eb89-default-rtdb.asia-southeast1.firebasedatabase.app",
+          projectId: "parking-info-7eb89",
+          storageBucket: "parking-info-7eb89.firebasestorage.app",
+          messagingSenderId: "446444341794",
+          appId: "1:446444341794:web:1b2bed0e7b4a55aab0987b",
+          measurementId: "G-66T1DDXPRF"
+        };
+
+        // Firebase 초기화
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // 기본 구역 설정
         const zones = {
             A: { max: 10, current: 0 },
             B: { max: 10, current: 0 }
         };
 
+        // 화면(UI) 업데이트
         function updateUI() {
-            // 수량 표시 업데이트
             document.getElementById('zoneA_count').innerText = zones.A.current;
             document.getElementById('zoneB_count').innerText = zones.B.current;
 
-            // 잔여석 비율 계산 및 여유 구역 추천
             let remA = zones.A.max - zones.A.current;
             let remB = zones.B.max - zones.B.current;
 
@@ -66,21 +82,41 @@
             document.getElementById('recommendZone').innerText = recommendText;
         }
 
+        // 2. 실시간 데이터 수신 (다른 사람이 변경하면 자동 실행됨)
+        db.ref('zones').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                if (data.A) zones.A.current = data.A.current;
+                if (data.B) zones.B.current = data.B.current;
+                updateUI();
+            } else {
+                // 초기 데이터가 없는 경우 DB 생성
+                db.ref('zones').set({
+                    A: { current: 0, max: 10 },
+                    B: { current: 0, max: 10 }
+                });
+            }
+        });
+
+        // 3. 수량 변경 시 DB에 전송 (모든 접속자에게 즉시 반영)
         function changeCount(zone, val) {
             let target = zones[zone];
+            let newCount = target.current + val;
+
             if (val > 0 && target.current >= target.max) {
                 alert(`${zone}구역은 이미 만차입니다!`);
                 return;
             }
-            if (val < 0 && target.current <= 0) {
-                return;
-            }
-            target.current += val;
-            updateUI();
-        }
+            if (newCount < 0) return;
 
-        // 최초 UI 실행
-        updateUI();
+            // 데이터베이스 업데이트
+            db.ref('zones/' + zone).update({
+                current: newCount,
+                max: target.max
+            });
+        }
     </script>
+</body>
+</html>
 </body>
 </html>
