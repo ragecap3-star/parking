@@ -115,7 +115,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // 4개 주차장 설정 (보문 주차장 max값 370대 반영)
+        // 4개 주차장 설정 (보문 주차장 max값 300대 반영)
         const zones = {
             ground: { name: '하이코 지상', max: 402, current: 0 },
             underground: { name: '하이코 지하', max: 118, current: 0 },
@@ -171,7 +171,7 @@
                     ground: { current: 0, max: 402 },
                     underground: { current: 0, max: 118 },
                     silla: { current: 0, max: 600 },
-                    bomun: { current: 0, max: 370 }
+                    bomun: { current: 0, max: 300 }
                 });
             }
         });
