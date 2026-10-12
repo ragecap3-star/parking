@@ -15,11 +15,14 @@
         .btn-in { background-color: #2ec4b6; }
         .btn-out { background-color: #e71d36; }
         .recommend { background-color: #eef2ff; border: 2px solid #6366f1; padding: 15px; border-radius: 8px; font-size: 20px; font-weight: bold; color: #4338ca; }
+        /* 약도 및 안내 문구 스타일 */
+        .map-img { max-width: 100%; height: auto; border-radius: 8px; margin-top: 10px; border: 1px solid #e5e7eb; }
+        .notice-box { font-size: 18px; font-weight: bold; color: #1e40af; background-color: #eff6ff; padding: 14px; border-radius: 8px; border: 1px solid #bfdbfe; margin-top: 15px; }
     </style>
 </head>
 <body>
 
-    <h2 id="pageTitle">🚗 YESDEX 2026 실시간 주차장 현황 - 관리자용</h2>
+    <h2 id="pageTitle">🚗 YESDEX 2026 실시간 주차장 현황 - 관리자용 </h2>
 
     <div class="card">
         <div>현재 이동 안내 구역</div>
@@ -53,7 +56,7 @@
     <!-- 4. 보문 단지 주차장 -->
     <div class="card">
         <h3>보문 단지 주차장 (최대 200대)</h3>
-        <div class="count"><span id="bomun_count">0</span> / 370</div>
+        <div class="count"><span id="bomun_count">0</span> / 200</div>
         <button class="btn btn-in" onclick="changeCount('bomun', 1)">입차 (+1)</button>
         <button class="btn btn-out" onclick="changeCount('bomun', -1)">출차 (-1)</button>
     </div>
@@ -66,7 +69,7 @@
             ℹ️ 투숙객은 호텔주차장 이용 가능하십니다
         </div>
     </div>
-    
+
     <script>
         // URL 주소 확인 (사용자 모드 ?mode=user 확인)
         const urlParams = new URLSearchParams(window.location.search);
@@ -93,7 +96,7 @@
           storageBucket: "parking-info-7eb89.firebasestorage.app",
           messagingSenderId: "446444341794",
           appId: "1:446444341794:web:1b2bed0e7b4a55aab0987b",
-          m내easurementId: "G-66T1DDXPRF"
+          measurementId: "G-66T1DDXPRF"
         };
 
         // Firebase 초기화
@@ -126,7 +129,6 @@
             if (remGround <= 0 && remUnderground <= 0 && remSilla <= 0 && remBomun <= 0) {
                 recommendText = "⛔ 전체 주차장이 만차입니다";
             } else {
-                // 가장 잔여 자리가 많은 곳을 추천
                 let maxRem = Math.max(remGround, remUnderground, remSilla, remBomun);
                 if (maxRem === remGround) {
                     recommendText = `👉 하이코 지상 주차장으로 이동하세요 (여유: ${remGround}석)`;
@@ -152,7 +154,6 @@
                 if (data.bomun) zones.bomun.current = data.bomun.current;
                 updateUI();
             } else {
-                // 초기 DB 구조 작성
                 db.ref('zones').set({
                     ground: { current: 0, max: 402 },
                     underground: { current: 0, max: 118 },
@@ -173,7 +174,6 @@
             }
             if (newCount < 0) return;
 
-            // 데이터베이스 업데이트
             db.ref('zones/' + zone).update({
                 current: newCount,
                 max: target.max
