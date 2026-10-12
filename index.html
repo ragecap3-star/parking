@@ -58,6 +58,15 @@
         <button class="btn btn-out" onclick="changeCount('bomun', -1)">출차 (-1)</button>
     </div>
 
+    <!-- 약도 및 투숙객 안내 카드 -->
+    <div class="card">
+        <h3 style="margin-top: 0; margin-bottom: 10px;">📍 주차장 위치 약도</h3>
+        <img src="map.jpg" alt="주차장 약도" class="map-img">
+        <div class="notice-box">
+            ℹ️ 투숙객은 호텔주차장 이용 가능하십니다
+        </div>
+    </div>
+    
     <script>
         // URL 주소 확인 (사용자 모드 ?mode=user 확인)
         const urlParams = new URLSearchParams(window.location.search);
