@@ -15,9 +15,13 @@
         .btn-in { background-color: #2ec4b6; }
         .btn-out { background-color: #e71d36; }
         .recommend { background-color: #eef2ff; border: 2px solid #6366f1; padding: 15px; border-radius: 8px; font-size: 20px; font-weight: bold; color: #4338ca; }
-        /* 약도 및 안내 문구 스타일 */
+        
+        /* 약도, 주소 및 안내 문구 스타일 */
         .map-img { max-width: 100%; height: auto; border-radius: 8px; margin-top: 10px; border: 1px solid #e5e7eb; }
-        .notice-box { font-size: 18px; font-weight: bold; color: #1e40af; background-color: #eff6ff; padding: 14px; border-radius: 8px; border: 1px solid #bfdbfe; margin-top: 15px; }
+        .address-box { margin-top: 15px; text-align: left; background: #f8fafc; padding: 14px 16px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 15px; line-height: 1.6; color: #334155; }
+        .address-item { margin-bottom: 6px; word-break: keep-all; }
+        .address-item:last-child { margin-bottom: 0; }
+        .notice-box { font-size: 18px; font-weight: bold; color: #1e40af; background-color: #eff6ff; padding: 14px; border-radius: 8px; border: 1px solid #bfdbfe; margin-top: 12px; }
     </style>
 </head>
 <body>
@@ -61,10 +65,18 @@
         <button class="btn btn-out" onclick="changeCount('bomun', -1)">출차 (-1)</button>
     </div>
 
-    <!-- 약도 및 투숙객 안내 카드 -->
+    <!-- 약도, 주소 및 투숙객 안내 카드 -->
     <div class="card">
         <h3 style="margin-top: 0; margin-bottom: 10px;">📍 주차장 위치 약도</h3>
         <img src="map.jpg" alt="주차장 약도" class="map-img">
+        
+        <!-- 주차장 주소 안내 구역 -->
+        <div class="address-box">
+            <div class="address-item">📌 <b>보문 주차장</b> : 경북 경주시 보문로 484-16</div>
+            <div class="address-item">📌 <b>신라밀레니엄 파크 주차장</b> : 경북 경주시 신평동 719-1</div>
+        </div>
+
+        <!-- 투숙객 안내 박스 -->
         <div class="notice-box">
             ℹ️ 투숙객은 호텔주차장 이용 가능하십니다
         </div>
@@ -103,12 +115,12 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // 4개 주차장 설정
+        // 4개 주차장 설정 (보문 주차장 max값 370대 반영)
         const zones = {
             ground: { name: '하이코 지상', max: 402, current: 0 },
             underground: { name: '하이코 지하', max: 118, current: 0 },
-            silla: { name: '신라 밀레니엄 파크', max: 600, current: 0 },
-            bomun: { name: '보문 단지', max: 200, current: 0 }
+            silla: { name: '신라밀레니엄 파크', max: 600, current: 0 },
+            bomun: { name: '보문 주차장', max: 370, current: 0 }
         };
 
         // UI 및 추천 구역 업데이트
@@ -154,11 +166,12 @@
                 if (data.bomun) zones.bomun.current = data.bomun.current;
                 updateUI();
             } else {
+                // 초기 DB 구조 생성
                 db.ref('zones').set({
                     ground: { current: 0, max: 402 },
                     underground: { current: 0, max: 118 },
                     silla: { current: 0, max: 600 },
-                    bomun: { current: 0, max: 200 }
+                    bomun: { current: 0, max: 370 }
                 });
             }
         });
@@ -169,7 +182,7 @@
             let newCount = target.current + val;
 
             if (val > 0 && target.current >= target.max) {
-                alert(`${target.name} 주차장은 이미 만차입니다!`);
+                alert(`${target.name}은 이미 만차입니다!`);
                 return;
             }
             if (newCount < 0) return;
