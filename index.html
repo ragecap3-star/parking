@@ -19,7 +19,7 @@
 </head>
 <body>
 
-    <h2>🚗 실시간 공유 주차장 현황</h2>
+    <h2 id="pageTitle">🚗 실시간 공유 주차장 현황</h2>
 
     <div class="card">
         <div>현재 이동 안내 구역</div>
@@ -51,6 +51,22 @@
     </div>
 
     <script>
+        // URL 주소 확인 (사용자 모드 ?mode=user 확인)
+        const urlParams = new URLSearchParams(window.location.search);
+        const isUserMode = urlParams.get('mode') === 'user';
+
+        // 화면 로딩 완료 후 이용객 모드일 경우 버튼 숨기기
+        window.addEventListener('DOMContentLoaded', () => {
+            if (isUserMode) {
+                // 입/출차 버튼 전체 숨기기
+                const buttons = document.querySelectorAll('.btn');
+                buttons.forEach(btn => btn.style.display = 'none');
+                
+                // 제목 변경
+                document.getElementById('pageTitle').innerText = '🚗 실시간 주차장 현황 안내';
+            }
+        });
+
         // Firebase 설정 정보
         const firebaseConfig = {
           apiKey: "AIzaSyDXLRc2RKlumTBbMKYSrVpUossDBjFscCg",
@@ -67,7 +83,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // 3개 주차장 설정 (이름 및 최대 대수)
+        // 3개 주차장 설정
         const zones = {
             ground: { name: '하이코 지상', max: 402, current: 0 },
             underground: { name: '하이코 지하', max: 118, current: 0 },
@@ -80,7 +96,6 @@
             document.getElementById('underground_count').innerText = zones.underground.current;
             document.getElementById('bomun_count').innerText = zones.bomun.current;
 
-            // 잔여 주차 대수 계산
             let remGround = zones.ground.max - zones.ground.current;
             let remUnderground = zones.underground.max - zones.underground.current;
             let remBomun = zones.bomun.max - zones.bomun.current;
@@ -90,7 +105,6 @@
             if (remGround <= 0 && remUnderground <= 0 && remBomun <= 0) {
                 recommendText = "⛔ 전체 주차장이 만차입니다";
             } else {
-                // 가장 잔여 자리가 많은 곳을 추천
                 let maxRem = Math.max(remGround, remUnderground, remBomun);
                 if (maxRem === remGround) {
                     recommendText = `👉 하이코 지상 주차장으로 이동하세요 (여유: ${remGround}석)`;
@@ -113,7 +127,6 @@
                 if (data.bomun) zones.bomun.current = data.bomun.current;
                 updateUI();
             } else {
-                // DB에 초기값이 없는 경우 세팅
                 db.ref('zones').set({
                     ground: { current: 0, max: 402 },
                     underground: { current: 0, max: 118 },
@@ -133,7 +146,6 @@
             }
             if (newCount < 0) return;
 
-            // 데이터베이스 업데이트
             db.ref('zones/' + zone).update({
                 current: newCount,
                 max: target.max
@@ -142,19 +154,3 @@
     </script>
 </body>
 </html>
-
-// URL 파라미터 체크 (?mode=user 인지 확인)
-const urlParams = new URLSearchParams(window.location.search);
-const isUserMode = urlParams.get('mode') === 'user';
-
-// DOM 로드 후 이용객 모드일 경우 처리
-window.addEventListener('DOMContentLoaded', () => {
-    if (isUserMode) {
-        // 입/출차 버튼 전체 숨기기
-        const buttons = document.querySelectorAll('.btn');
-        buttons.forEach(btn => btn.style.display = 'none');
-        
-        // (선택) 타이틀 변경
-        document.querySelector('h2').innerText = '🚗 실시간 주차장 현황 안내';
-    }
-});
