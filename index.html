@@ -142,19 +142,3 @@
     </script>
 </body>
 </html>
-
-// URL 파라미터 체크 (?mode=user 인지 확인)
-const urlParams = new URLSearchParams(window.location.search);
-const isUserMode = urlParams.get('mode') === 'user';
-
-// DOM 로드 후 이용객 모드일 경우 처리
-window.addEventListener('DOMContentLoaded', () => {
-    if (isUserMode) {
-        // 입/출차 버튼 전체 숨기기
-        const buttons = document.querySelectorAll('.btn');
-        buttons.forEach(btn => btn.style.display = 'none');
-        
-        // (선택) 타이틀 변경
-        document.querySelector('h2').innerText = '🚗 실시간 주차장 현황 안내';
-    }
-});
