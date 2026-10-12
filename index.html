@@ -19,7 +19,7 @@
 </head>
 <body>
 
-    <h2 id="pageTitle">🚗 실시간 공유 주차장 현황</h2>
+    <h2 id="pageTitle">🚗 YESDEX 2026 실시간 주차장 현황</h2>
 
     <div class="card">
         <div>현재 이동 안내 구역</div>
@@ -53,7 +53,7 @@
     <!-- 4. 보문 단지 주차장 -->
     <div class="card">
         <h3>보문 단지 주차장 (최대 200대)</h3>
-        <div class="count"><span id="bomun_count">0</span> / 200</div>
+        <div class="count"><span id="bomun_count">0</span> / 370</div>
         <button class="btn btn-in" onclick="changeCount('bomun', 1)">입차 (+1)</button>
         <button class="btn btn-out" onclick="changeCount('bomun', -1)">출차 (-1)</button>
     </div>
@@ -71,7 +71,7 @@
                 buttons.forEach(btn => btn.style.display = 'none');
                 
                 // 제목 변경
-                document.getElementById('pageTitle').innerText = '🚗 실시간 주차장 현황 안내';
+                document.getElementById('pageTitle').innerText = '🚗 YESDEX 2026 실시간 주차장 현황 안';
             }
         });
 
@@ -84,7 +84,7 @@
           storageBucket: "parking-info-7eb89.firebasestorage.app",
           messagingSenderId: "446444341794",
           appId: "1:446444341794:web:1b2bed0e7b4a55aab0987b",
-          measurementId: "G-66T1DDXPRF"
+          m내easurementId: "G-66T1DDXPRF"
         };
 
         // Firebase 초기화
