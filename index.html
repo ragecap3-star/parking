@@ -35,7 +35,7 @@
 
     <!-- 1. 하이코 지상 주차장 -->
     <div class="card">
-        <h3>하이코 지상 주차장 (최대 402대)</h3>
+        <h3>하이코 지상 주차장 (주차 가능 대수: <span id="ground_rem">402</span>대)</h3>
         <div class="count"><span id="ground_count">0</span> / 402</div>
         <button class="btn btn-in" onclick="changeCount('ground', 1)">입차 (+1)</button>
         <button class="btn btn-out" onclick="changeCount('ground', -1)">출차 (-1)</button>
@@ -43,7 +43,7 @@
 
     <!-- 2. 하이코 지하 주차장 -->
     <div class="card">
-        <h3>하이코 지하 주차장 (최대 118대)</h3>
+        <h3>하이코 지하 주차장 (주차 가능 대수: <span id="underground_rem">118</span>대)</h3>
         <div class="count"><span id="underground_count">0</span> / 118</div>
         <button class="btn btn-in" onclick="changeCount('underground', 1)">입차 (+1)</button>
         <button class="btn btn-out" onclick="changeCount('underground', -1)">출차 (-1)</button>
@@ -51,15 +51,15 @@
 
     <!-- 3. 보문 주차장 -->
     <div class="card">
-        <h3>보문 주차장 (최대 300대)</h3>
+        <h3>보문 주차장 (주차 가능 대수: <span id="bomun_rem">300</span>대)</h3>
         <div class="count"><span id="bomun_count">0</span> / 300</div>
         <button class="btn btn-in" onclick="changeCount('bomun', 1)">입차 (+1)</button>
         <button class="btn btn-out" onclick="changeCount('bomun', -1)">출차 (-1)</button>
     </div>
 
-        <!-- 4. 신라밀레니엄파크 주차장 -->
+    <!-- 4. 신라밀레니엄파크 주차장 -->
     <div class="card">
-        <h3>신라밀레니엄 파크 주차장 (최대 600대)</h3>
+        <h3>신라밀레니엄 파크 주차장 (주차 가능 대수: <span id="silla_rem">600</span>대)</h3>
         <div class="count"><span id="silla_count">0</span> / 600</div>
         <button class="btn btn-in" onclick="changeCount('silla', 1)">입차 (+1)</button>
         <button class="btn btn-out" onclick="changeCount('silla', -1)">출차 (-1)</button>
@@ -130,11 +130,17 @@
             document.getElementById('silla_count').innerText = zones.silla.current;
             document.getElementById('bomun_count').innerText = zones.bomun.current;
 
-            // 잔여 주차 대수 계산
+            // 잔여 주차 대수 계산 (최대 대수 - 현재 입차 수)
             let remGround = zones.ground.max - zones.ground.current;
             let remUnderground = zones.underground.max - zones.underground.current;
             let remSilla = zones.silla.max - zones.silla.current;
             let remBomun = zones.bomun.max - zones.bomun.current;
+
+            // 상단 제목의 '주차 가능 대수' 실시간 동기화
+            document.getElementById('ground_rem').innerText = remGround < 0 ? 0 : remGround;
+            document.getElementById('underground_rem').innerText = remUnderground < 0 ? 0 : remUnderground;
+            document.getElementById('silla_rem').innerText = remSilla < 0 ? 0 : remSilla;
+            document.getElementById('bomun_rem').innerText = remBomun < 0 ? 0 : remBomun;
 
             let recommendText = "";
 
