@@ -19,7 +19,7 @@
 </head>
 <body>
 
-    <h2 id="pageTitle">🚗 YESDEX 2026 실시간 주차장 현황</h2>
+    <h2 id="pageTitle">🚗 실시간 공유 주차장 현황</h2>
 
     <div class="card">
         <div>현재 이동 안내 구역</div>
@@ -42,14 +42,14 @@
         <button class="btn btn-out" onclick="changeCount('underground', -1)">출차 (-1)</button>
     </div>
 
-        <!-- 3. 신라 밀레니엄파크 주차장 -->
+    <!-- 3. 신라 밀레니엄 파크 주차장 -->
     <div class="card">
-        <h3>신라 밀레니엄파크 주차장 (최대 600대)</h3>
-        <div class="count"><span id="bomun_count">0</span> / 600</div>
-        <button class="btn btn-in" onclick="changeCount('bomun', 1)">입차 (+1)</button>
-        <button class="btn btn-out" onclick="changeCount('bomun', -1)">출차 (-1)</button>
+        <h3>신라 밀레니엄 파크 주차장 (최대 600대)</h3>
+        <div class="count"><span id="silla_count">0</span> / 600</div>
+        <button class="btn btn-in" onclick="changeCount('silla', 1)">입차 (+1)</button>
+        <button class="btn btn-out" onclick="changeCount('silla', -1)">출차 (-1)</button>
     </div>
-    
+
     <!-- 4. 보문 단지 주차장 -->
     <div class="card">
         <h3>보문 단지 주차장 (최대 200대)</h3>
@@ -71,7 +71,7 @@
                 buttons.forEach(btn => btn.style.display = 'none');
                 
                 // 제목 변경
-                document.getElementById('pageTitle').innerText = '🚗 YESDEX 2026 실시간 주차장 현황 안내';
+                document.getElementById('pageTitle').innerText = '🚗 실시간 주차장 현황 안내';
             }
         });
 
@@ -91,10 +91,11 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // 3개 주차장 설정
+        // 4개 주차장 설정
         const zones = {
             ground: { name: '하이코 지상', max: 402, current: 0 },
             underground: { name: '하이코 지하', max: 118, current: 0 },
+            silla: { name: '신라 밀레니엄 파크', max: 600, current: 0 },
             bomun: { name: '보문 단지', max: 200, current: 0 }
         };
 
@@ -102,22 +103,28 @@
         function updateUI() {
             document.getElementById('ground_count').innerText = zones.ground.current;
             document.getElementById('underground_count').innerText = zones.underground.current;
+            document.getElementById('silla_count').innerText = zones.silla.current;
             document.getElementById('bomun_count').innerText = zones.bomun.current;
 
+            // 잔여 주차 대수 계산
             let remGround = zones.ground.max - zones.ground.current;
             let remUnderground = zones.underground.max - zones.underground.current;
+            let remSilla = zones.silla.max - zones.silla.current;
             let remBomun = zones.bomun.max - zones.bomun.current;
 
             let recommendText = "";
 
-            if (remGround <= 0 && remUnderground <= 0 && remBomun <= 0) {
+            if (remGround <= 0 && remUnderground <= 0 && remSilla <= 0 && remBomun <= 0) {
                 recommendText = "⛔ 전체 주차장이 만차입니다";
             } else {
-                let maxRem = Math.max(remGround, remUnderground, remBomun);
+                // 가장 잔여 자리가 많은 곳을 추천
+                let maxRem = Math.max(remGround, remUnderground, remSilla, remBomun);
                 if (maxRem === remGround) {
                     recommendText = `👉 하이코 지상 주차장으로 이동하세요 (여유: ${remGround}석)`;
                 } else if (maxRem === remUnderground) {
                     recommendText = `👉 하이코 지하 주차장으로 이동하세요 (여유: ${remUnderground}석)`;
+                } else if (maxRem === remSilla) {
+                    recommendText = `👉 신라 밀레니엄 파크 주차장으로 이동하세요 (여유: ${remSilla}석)`;
                 } else {
                     recommendText = `👉 보문 단지 주차장으로 이동하세요 (여유: ${remBomun}석)`;
                 }
@@ -132,12 +139,15 @@
             if (data) {
                 if (data.ground) zones.ground.current = data.ground.current;
                 if (data.underground) zones.underground.current = data.underground.current;
+                if (data.silla) zones.silla.current = data.silla.current;
                 if (data.bomun) zones.bomun.current = data.bomun.current;
                 updateUI();
             } else {
+                // 초기 DB 구조 작성
                 db.ref('zones').set({
                     ground: { current: 0, max: 402 },
                     underground: { current: 0, max: 118 },
+                    silla: { current: 0, max: 600 },
                     bomun: { current: 0, max: 200 }
                 });
             }
@@ -154,6 +164,7 @@
             }
             if (newCount < 0) return;
 
+            // 데이터베이스 업데이트
             db.ref('zones/' + zone).update({
                 current: newCount,
                 max: target.max
