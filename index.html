@@ -23,9 +23,9 @@
         .address-item:last-child { margin-bottom: 0; }
         .notice-box { font-size: 18px; font-weight: bold; color: #1e40af; background-color: #eff6ff; padding: 14px; border-radius: 8px; border: 1px solid #bfdbfe; margin-top: 12px; }
 
-        /* 네비게이션 버튼 스타일 */
-        .nav-btn-group { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
-        .nav-btn { flex: 1; min-width: 80px; text-align: center; padding: 8px 6px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold; }
+        /* 네비게이션 버튼 스타일 (한 줄 고정 및 균등 분배) */
+        .nav-btn-group { display: flex; gap: 4px; margin-top: 8px; flex-wrap: nowrap; }
+        .nav-btn { flex: 1; min-width: 0; text-align: center; padding: 9px 2px; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: bold; white-space: nowrap; }
         .nav-naver { background-color: #03CF5D; color: white; }
         .nav-kakao { background-color: #FEE500; color: #191919; }
         .nav-tmap { background-color: #0062FF; color: white; }
@@ -85,6 +85,7 @@
                 <div class="nav-btn-group">
                     <a href="https://map.naver.com/p/search/경주화백컨벤션센터입구1" target="_blank" class="nav-btn nav-naver">네이버 지도</a>
                     <a href="https://map.kakao.com/link/search/하이코+주차장" target="_blank" class="nav-btn nav-kakao">카카오맵</a>
+                    <a href="tmap://search?name=경주화백컨벤션센터" target="_blank" class="nav-btn nav-tmap">T맵</a>
                 </div>
             </div>
             
@@ -94,6 +95,7 @@
                 <div class="nav-btn-group">
                     <a href="https://map.naver.com/p/search/보문관광단지주차장입구" target="_blank" class="nav-btn nav-naver">네이버 지도</a>
                     <a href="https://kko.to/6oNKe7BtIo" target="_blank" class="nav-btn nav-kakao">카카오맵</a>
+                    <a href="tmap://search?name=보문관광단지주차장" target="_blank" class="nav-btn nav-tmap">T맵</a>
                 </div>
             </div>
 
@@ -103,6 +105,7 @@
                 <div class="nav-btn-group">
                     <a href="https://naver.me/Fx2YFHdC" target="_blank" class="nav-btn nav-naver">네이버 지도</a>
                     <a href="https://kko.to/1uoEar2LTw" target="_blank" class="nav-btn nav-kakao">카카오맵</a>
+                    <a href="tmap://search?name=더케이호텔+경주+후문" target="_blank" class="nav-btn nav-tmap">T맵</a>
                 </div>
             </div>
         </div>
