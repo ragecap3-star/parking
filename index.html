@@ -141,10 +141,9 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // 4개 주차장 설정 (보문 주차장 max값 300대 반영)
+        // 3개 주차장 설정 (하이코 520, 신라밀레니엄 600, 보문 300)
         const zones = {
-            ground: { name: '하이코', max: 520, current: 0 },
-            underground: { name: '하이코 지하', max: 118, current: 0 },
+            ground: { name: '하이코 주차장', max: 520, current: 0 },
             silla: { name: '신라밀레니엄 파크', max: 600, current: 0 },
             bomun: { name: '보문 주차장', max: 300, current: 0 }
         };
@@ -152,32 +151,27 @@
         // UI 및 추천 구역 업데이트
         function updateUI() {
             document.getElementById('ground_count').innerText = zones.ground.current;
-            document.getElementById('underground_count').innerText = zones.underground.current;
-            document.getElementById('silla_count').innerText = zones.silla.current;
             document.getElementById('bomun_count').innerText = zones.bomun.current;
+            document.getElementById('silla_count').innerText = zones.silla.current;
 
             // 잔여 주차 대수 계산 (최대 대수 - 현재 입차 수)
             let remGround = zones.ground.max - zones.ground.current;
-            let remUnderground = zones.underground.max - zones.underground.current;
-            let remSilla = zones.silla.max - zones.silla.current;
             let remBomun = zones.bomun.max - zones.bomun.current;
+            let remSilla = zones.silla.max - zones.silla.current;
 
             // 상단 제목의 '주차 가능 대수' 실시간 동기화
             document.getElementById('ground_rem').innerText = remGround < 0 ? 0 : remGround;
-            document.getElementById('underground_rem').innerText = remUnderground < 0 ? 0 : remUnderground;
-            document.getElementById('silla_rem').innerText = remSilla < 0 ? 0 : remSilla;
             document.getElementById('bomun_rem').innerText = remBomun < 0 ? 0 : remBomun;
+            document.getElementById('silla_rem').innerText = remSilla < 0 ? 0 : remSilla;
 
             let recommendText = "";
 
-            if (remGround <= 0 && remUnderground <= 0 && remSilla <= 0 && remBomun <= 0) {
+            if (remGround <= 0 && remBomun <= 0 && remSilla <= 0) {
                 recommendText = "⛔ 전체 주차장이 만차입니다";
             } else {
-                let maxRem = Math.max(remGround, remUnderground, remSilla, remBomun);
+                let maxRem = Math.max(remGround, remBomun, remSilla);
                 if (maxRem === remGround) {
                     recommendText = `👉 하이코 주차장 (잔여 공간 : ${remGround}대)`;
-                } else if (maxRem === remUnderground) {
-                    recommendText = `👉 하이코 지하 주차장 (잔여 공간 : ${remUnderground}대)`;
                 } else if (maxRem === remSilla) {
                     recommendText = `👉 신라밀레니엄 파크 주차장 (잔여 공간 : ${remSilla}대)`;
                 } else {
@@ -193,17 +187,15 @@
             const data = snapshot.val();
             if (data) {
                 if (data.ground) zones.ground.current = data.ground.current;
-                if (data.underground) zones.underground.current = data.underground.current;
-                if (data.silla) zones.silla.current = data.silla.current;
                 if (data.bomun) zones.bomun.current = data.bomun.current;
+                if (data.silla) zones.silla.current = data.silla.current;
                 updateUI();
             } else {
                 // 초기 DB 구조 생성
                 db.ref('zones').set({
                     ground: { current: 0, max: 520 },
-                    underground: { current: 0, max: 118 },
-                    silla: { current: 0, max: 600 },
-                    bomun: { current: 0, max: 300 }
+                    bomun: { current: 0, max: 300 },
+                    silla: { current: 0, max: 600 }
                 });
             }
         });
