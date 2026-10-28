@@ -143,7 +143,7 @@
 
         // 4개 주차장 설정 (보문 주차장 max값 300대 반영)
         const zones = {
-            ground: { name: '하이코 지상', max: 520, current: 0 },
+            ground: { name: '하이코', max: 520, current: 0 },
             underground: { name: '하이코 지하', max: 118, current: 0 },
             silla: { name: '신라밀레니엄 파크', max: 600, current: 0 },
             bomun: { name: '보문 주차장', max: 300, current: 0 }
@@ -175,7 +175,7 @@
             } else {
                 let maxRem = Math.max(remGround, remUnderground, remSilla, remBomun);
                 if (maxRem === remGround) {
-                    recommendText = `👉 하이코 지상 주차장 (잔여 공간 : ${remGround}대)`;
+                    recommendText = `👉 하이코 주차장 (잔여 공간 : ${remGround}대)`;
                 } else if (maxRem === remUnderground) {
                     recommendText = `👉 하이코 지하 주차장 (잔여 공간 : ${remUnderground}대)`;
                 } else if (maxRem === remSilla) {
