@@ -42,8 +42,8 @@
 
     <!-- 1. 하이코 주차장 -->
     <div class="card">
-        <h3>하이코 주차장 (주차 가능 : <span id="ground_rem">520</span>대)</h3>
-        <div class="count"><span id="ground_count">0</span> / 520</div>
+        <h3>하이코 주차장 (주차 가능 : <span id="ground_rem">461</span>대)</h3>
+        <div class="count"><span id="ground_count">0</span> / 461</div>
         <button class="btn btn-in" onclick="changeCount('ground', 1)">입차 (+1)</button>
         <button class="btn btn-out" onclick="changeCount('ground', -1)">출차 (-1)</button>
     </div>
@@ -141,9 +141,9 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // 3개 주차장 설정 (하이코 520, 신라밀레니엄 600, 보문 300)
+        // 3개 주차장 설정 (하이코 461, 신라밀레니엄 600, 보문 300)
         const zones = {
-            ground: { name: '하이코 주차장', max: 520, current: 0 },
+            ground: { name: '하이코 주차장', max: 461, current: 0 },
             silla: { name: '신라밀레니엄 파크', max: 600, current: 0 },
             bomun: { name: '보문 주차장', max: 300, current: 0 }
         };
@@ -193,7 +193,7 @@
             } else {
                 // 초기 DB 구조 생성
                 db.ref('zones').set({
-                    ground: { current: 0, max: 520 },
+                    ground: { current: 0, max: 461 },
                     bomun: { current: 0, max: 300 },
                     silla: { current: 0, max: 600 }
                 });
